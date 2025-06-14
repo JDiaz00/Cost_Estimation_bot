@@ -1,0 +1,42 @@
+[
+  {
+    "role": "user",
+    "content": "hola",
+    "timestamp": "2025-06-14T00:28:44.055731"
+  },
+  {
+    "role": "assistant",
+    "content": "¡Hola! ¿En qué puedo ayudarte hoy? Si tienes alguna consulta sobre costos de construcción, materiales, presupuestos de obras o cualquier tema relacionado con construcción, por favor, dime tu pregunta específica y te brindaré una estimación detallada.",
+    "timestamp": "2025-06-14T00:28:47.279966"
+  },
+  {
+    "role": "user",
+    "content": "me llamo julio",
+    "timestamp": "2025-06-14T00:28:56.317244"
+  },
+  {
+    "role": "assistant",
+    "content": "¡Mucho gusto, Julio! Si necesitas ayuda con algún tema de construcción, como cotizaciones, costos de materiales, presupuestos de obra o estimaciones por metro cuadrado, cuéntame los detalles y te ayudaré con información precisa y un desglose detallado. ¿En qué proyecto o consulta de construcción puedo ayudarte hoy?",
+    "timestamp": "2025-06-14T00:28:58.304076"
+  },
+  {
+    "role": "user",
+    "content": "hola me llamo julio",
+    "timestamp": "2025-06-14T00:33:40.727919"
+  },
+  {
+    "role": "assistant",
+    "content": "¡Hola, Julio! Mucho gusto en saludarte. Si tienes alguna consulta sobre construcción, como costos, materiales, presupuestos o cualquier estimación para proyectos de obra, dime qué necesitas y te ayudaré con información clara y detallada. ¿En qué proyecto o consulta específica de construcción te gustaría que te ayude hoy?",
+    "timestamp": "2025-06-14T00:33:44.205929"
+  },
+  {
+    "role": "user",
+    "content": "como me llamo?",
+    "timestamp": "2025-06-14T00:33:52.881665"
+  },
+  {
+    "role": "assistant",
+    "content": "Tu nombre es Julio. ¿En qué puedo ayudarte hoy, especialmente si es sobre temas de construcción?",
+    "timestamp": "2025-06-14T00:33:54.127658"
+  }
+]
