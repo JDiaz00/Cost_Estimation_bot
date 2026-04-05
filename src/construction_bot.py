@@ -4,20 +4,20 @@ Construction Cost Estimation Bot.
 
 Main bot class for construction cost queries with message history.
 """
+
+import json
 import logging
 import os
-import json
-import asyncio
 from datetime import datetime
-from typing import List, Any, Dict, Optional
+from typing import Any
 
-from langchain_mcp_adapters.client import MultiServerMCPClient
-from langgraph.prebuilt import create_react_agent
-from langchain_openai import ChatOpenAI
-from langchain.schema import HumanMessage, AIMessage
+from langchain.schema import HumanMessage
 from langchain.tools import tool as langchain_tool
+from langchain_mcp_adapters.client import MultiServerMCPClient
+from langchain_openai import ChatOpenAI
+from langgraph.prebuilt import create_react_agent
 
-from .config import MAX_HISTORY_LENGTH, DEFAULT_HISTORY_FILE, MODEL_NAME
+from .config import DEFAULT_HISTORY_FILE, MAX_HISTORY_LENGTH, MODEL_NAME
 
 logger = logging.getLogger(__name__)
 
@@ -26,13 +26,13 @@ class ConstructionCostBot:
     """Chatbot specialized in construction cost estimation and budgeting."""
 
     def __init__(self, history_file: str = DEFAULT_HISTORY_FILE) -> None:
-        self.agent: Optional[Any] = None
-        self.tools: List[Any] = []
+        self.agent: Any | None = None
+        self.tools: list[Any] = []
         self.history_file: str = history_file
-        self.message_history: List[Dict[str, str]] = []
+        self.message_history: list[dict[str, str]] = []
         self.max_history_length: int = MAX_HISTORY_LENGTH
-        self.last_tools_used: List[Dict[str, Any]] = []
-        self.client: Optional[MultiServerMCPClient] = None
+        self.last_tools_used: list[dict[str, Any]] = []
+        self.client: MultiServerMCPClient | None = None
 
     async def initialize(self) -> None:
         """Initialize the agent with tools and load history."""
@@ -52,12 +52,12 @@ class ConstructionCostBot:
         """Load chat history from JSON file."""
         try:
             if os.path.exists(self.history_file):
-                with open(self.history_file, "r", encoding="utf-8") as f:
+                with open(self.history_file, encoding="utf-8") as f:
                     self.message_history = json.load(f)
                 logger.info("Historial cargado: %d mensajes", len(self.message_history))
             else:
                 logger.info("Iniciando nuevo historial")
-        except (json.JSONDecodeError, IOError) as e:
+        except (OSError, json.JSONDecodeError) as e:
             logger.warning("Error cargando historial: %s", e)
             self.message_history = []
 
@@ -66,12 +66,12 @@ class ConstructionCostBot:
         try:
             with open(self.history_file, "w", encoding="utf-8") as f:
                 json.dump(self.message_history, f, ensure_ascii=False, indent=2)
-        except IOError as e:
+        except OSError as e:
             logger.warning("Error guardando historial: %s", e)
 
     def add_to_history(self, role: str, content: str) -> None:
         """Add a message to the conversation history."""
-        message: Dict[str, str] = {
+        message: dict[str, str] = {
             "role": role,
             "content": content,
             "timestamp": datetime.now().isoformat(),
@@ -171,7 +171,8 @@ class ConstructionCostBot:
 INSTRUCCIONES IMPORTANTES:
 - SOLO utiliza la herramienta construction_query para preguntas relacionadas con CONSTRUCCIÓN
 - Antes de usar cualquier herramienta, EVALÚA si la pregunta es sobre construcción
-- Preguntas de construcción incluyen: costos, materiales, edificación, obras civiles, presupuestos de construcción
+- Preguntas de construcción incluyen: costos, materiales, edificación,
+  obras civiles, presupuestos de construcción
 - Si la pregunta NO es sobre construcción, responde directamente sin usar herramientas
 - Considera el historial de conversación para dar respuestas más contextuales
 
@@ -188,7 +189,8 @@ TEMAS NO CONSTRUCCIÓN:
 - Otros temas no relacionados
 - Conversación casual
 
-Cuando uses la herramienta construction_query, proporciona estimaciones claras con números específicos y desglose detallado."""
+Cuando uses la herramienta construction_query, proporciona estimaciones
+claras con números específicos y desglose detallado."""
 
     async def ask(self, question: str) -> str:
         """Process a construction cost question with history context.
@@ -220,13 +222,11 @@ Cuando uses la herramienta construction_query, proporciona estimaciones claras c
                 bool(history_context.strip()),
             )
 
-            result = await self.agent.ainvoke(
-                {"messages": [HumanMessage(content=full_prompt)]}
-            )
+            result = await self.agent.ainvoke({"messages": [HumanMessage(content=full_prompt)]})
 
             # Extract response and track tools used
             response = ""
-            tools_used: List[Dict[str, Any]] = []
+            tools_used: list[dict[str, Any]] = []
 
             if isinstance(result, dict) and "messages" in result:
                 messages = result["messages"]
@@ -237,7 +237,11 @@ Cuando uses la herramienta construction_query, proporciona estimaciones claras c
                             tools_used.append(
                                 {
                                     "name": tool_name,
-                                    "type": "mcp_tool" if hasattr(tool_call, "args") else "fallback_tool",
+                                    "type": (
+                                        "mcp_tool"
+                                        if hasattr(tool_call, "args")
+                                        else "fallback_tool"
+                                    ),
                                     "args": getattr(tool_call, "args", {}),
                                     "used_at": datetime.now().isoformat(),
                                 }
@@ -271,7 +275,7 @@ Cuando uses la herramienta construction_query, proporciona estimaciones claras c
         """Process query (compatibility wrapper for Gradio integration)."""
         return await self.ask(query)
 
-    def get_last_tools_used(self) -> List[Dict[str, Any]]:
+    def get_last_tools_used(self) -> list[dict[str, Any]]:
         """Get tools used in the last query."""
         return self.last_tools_used
 
@@ -280,10 +284,10 @@ Cuando uses la herramienta construction_query, proporciona estimaciones claras c
         self.clear_history()
         self.last_tools_used = []
 
-    def get_chat_history_for_gradio(self) -> List[tuple[str, str]]:
+    def get_chat_history_for_gradio(self) -> list[tuple[str, str]]:
         """Get chat history formatted for Gradio chatbot component."""
-        chat_history: List[tuple[str, str]] = []
-        temp_user_msg: Optional[str] = None
+        chat_history: list[tuple[str, str]] = []
+        temp_user_msg: str | None = None
 
         for msg in self.message_history:
             if msg["role"] == "user":

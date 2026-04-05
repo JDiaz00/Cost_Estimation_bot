@@ -4,19 +4,19 @@ Gradio Interface for Construction Cost Estimation Chatbot.
 
 Provides a web-based chat UI for interacting with the construction cost bot.
 """
+
 import asyncio
 import logging
-from typing import List, Tuple, Optional
 
 import gradio as gr
 
-from .construction_bot import ConstructionCostBot
 from .config import GRADIO_SERVER_PORT
+from .construction_bot import ConstructionCostBot
 
 logger = logging.getLogger(__name__)
 
 # Module-level bot instance, initialized on first use
-_bot: Optional[ConstructionCostBot] = None
+_bot: ConstructionCostBot | None = None
 
 
 async def _get_bot() -> ConstructionCostBot:
@@ -29,8 +29,8 @@ async def _get_bot() -> ConstructionCostBot:
 
 
 async def chat_interface(
-    message: str, history: List[Tuple[str, str]]
-) -> Tuple[str, List[Tuple[str, str]]]:
+    message: str, history: list[tuple[str, str]]
+) -> tuple[str, list[tuple[str, str]]]:
     """Process a chat message and return updated history.
 
     Args:
@@ -53,7 +53,7 @@ async def chat_interface(
         return "", history + [(message, error_response)]
 
 
-def clear_chat() -> List:
+def clear_chat() -> list:
     """Clear chat history."""
     global _bot
     if _bot:
@@ -79,8 +79,7 @@ def create_gradio_interface() -> gr.Blocks:
 
         clear_btn = gr.Button("Limpiar Chat")
 
-        gr.Markdown(
-            """
+        gr.Markdown("""
         ## Tipos de consultas:
         - Costos de construcción
         - Materiales y cantidades
@@ -92,12 +91,11 @@ def create_gradio_interface() -> gr.Blocks:
         - "¿Cuánto cuesta construir una casa de 120m²?"
         - "Materiales para una losa de 50m²"
         - "Presupuesto para pintar 200m² de pared"
-        """
-        )
+        """)
 
         def _sync_chat_wrapper(
-            message: str, history: List[Tuple[str, str]]
-        ) -> Tuple[str, List[Tuple[str, str]]]:
+            message: str, history: list[tuple[str, str]]
+        ) -> tuple[str, list[tuple[str, str]]]:
             """Synchronous wrapper around the async chat handler."""
             try:
                 return asyncio.run(chat_interface(message, history))
