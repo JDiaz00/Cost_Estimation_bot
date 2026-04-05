@@ -1,0 +1,16 @@
+.git
+.env
+.venv
+__pycache__
+*.pyc
+*.pyo
+poetry.lock
+chat_history.json
+.mypy_cache
+.ruff_cache
+.pytest_cache
+*.egg-info
+dist
+build
+.agent
+openspec

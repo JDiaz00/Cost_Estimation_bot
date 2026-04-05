@@ -37,3 +37,15 @@ ENV/
 # Local environment variables
 .env
 .env.local
+.env.*.local
+
+# Runtime artifacts
+chat_history.json
+
+# Build
+dist/
+build/
+
+# Linters and type checkers
+.ruff_cache/
+.mypy_cache/

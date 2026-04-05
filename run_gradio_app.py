@@ -1,84 +1,83 @@
 #!/usr/bin/env python3
-"""
-Launcher script for Construction Cost Estimation Gradio App
-"""
+"""Launcher script for the Construction Cost Estimation Gradio App."""
 import sys
-import subprocess
 import os
+import logging
 
-def check_dependencies():
-    """Check if required dependencies are installed"""
+from dotenv import load_dotenv
+
+logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
+logger = logging.getLogger(__name__)
+
+
+def check_dependencies() -> bool:
+    """Check if required Python packages are installed."""
     required_packages = [
-        'gradio',
-        'langchain',
-        'langchain_openai',
-        'langchain_mcp_adapters',
-        'langgraph'
+        "gradio",
+        "langchain",
+        "langchain_openai",
+        "langchain_mcp_adapters",
+        "langgraph",
     ]
-    
+
     missing_packages = []
-    
     for package in required_packages:
         try:
-            __import__(package.replace('-', '_'))
+            __import__(package.replace("-", "_"))
         except ImportError:
             missing_packages.append(package)
-    
+
     if missing_packages:
-        print("❌ Paquetes faltantes:")
+        logger.error("Paquetes faltantes:")
         for pkg in missing_packages:
-            print(f"   - {pkg}")
-        print("\n💡 Para instalar las dependencias:")
-        print("   pip install -r requirements_gradio.txt")
+            logger.error("   - %s", pkg)
+        logger.info("Para instalar: pip install -r requirements.txt")
         return False
-    
+
     return True
 
-def main():
-    """Main launcher function"""
-    print("🚀 Iniciando Chatbot de Construcción con Gradio")
+
+def main() -> int:
+    """Launch the Gradio web application."""
+    print("Iniciando Chatbot de Construcción con Gradio")
     print("-" * 50)
-    
-    # Check if required files exist
-    required_files = ['construction_chatbot.py', 'gradio_app.py']
-    for file in required_files:
-        if not os.path.exists(file):
-            print(f"❌ Archivo requerido no encontrado: {file}")
-            return 1
-    
+
+    # Load environment variables
+    load_dotenv()
+
     # Check dependencies
-    print("🔍 Verificando dependencias...")
+    print("Verificando dependencias...")
     if not check_dependencies():
         return 1
-    
-    print("✅ Todas las dependencias están instaladas")
-    
+    print("Todas las dependencias están instaladas")
+
     # Check API key
-    if not os.environ.get('OPENAI_API_KEY'):
-        print("⚠️ ADVERTENCIA: OPENAI_API_KEY no encontrada en variables de entorno")
-        print("   La aplicación intentará usar la clave hardcodeada en construction_chatbot.py")
-    
-    print("\n🌐 Iniciando servidor Gradio...")
-    print("📱 La aplicación estará disponible en: http://localhost:7860")
-    print("🛑 Presiona Ctrl+C para detener la aplicación")
-    print("-" * 50)
-    
-    try:
-        # Import and run the gradio app
-        from gradio_app import demo
-        demo.launch(
-            server_name="0.0.0.0",
-            server_port=7860,
-            share=False,
-            debug=False,
-            show_error=True
+    if not os.environ.get("OPENAI_API_KEY"):
+        logger.warning(
+            "OPENAI_API_KEY no encontrada. "
+            "Crea un archivo .env con tu clave API."
         )
+
+    print()
+    print("Iniciando servidor Gradio...")
+    print("La aplicación estará disponible en: http://localhost:7860")
+    print("Presiona Ctrl+C para detener la aplicación")
+    print("-" * 50)
+
+    try:
+        import asyncio
+        from src.gradio_interface import launch_gradio
+
+        asyncio.run(launch_gradio())
     except KeyboardInterrupt:
-        print("\n🛑 Aplicación detenida por el usuario")
+        print("\nAplicación detenida por el usuario")
         return 0
     except Exception as e:
-        print(f"\n❌ Error ejecutando la aplicación: {e}")
+        logger.error("Error ejecutando la aplicación: %s", e)
         return 1
 
+    return 0
+
+
 if __name__ == "__main__":
-    sys.exit(main()) 
+    sys.exit(main())
