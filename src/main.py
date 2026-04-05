@@ -9,7 +9,6 @@ import asyncio
 import logging
 
 from .construction_bot import ConstructionCostBot
-from .gradio_interface import launch_gradio
 
 logger = logging.getLogger(__name__)
 
@@ -74,6 +73,8 @@ async def main() -> None:
     ).strip()
 
     if choice == "2":
+        from .gradio_interface import launch_gradio
+
         await launch_gradio()
     else:
         await run_cli()
