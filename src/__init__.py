@@ -10,11 +10,11 @@ from .construction_bot import ConstructionCostBot
 from .main import main
 
 
-def launch_gradio() -> None:
+async def launch_gradio() -> None:
     """Lazy import to avoid loading gradio at package level."""
     from .gradio_interface import launch_gradio as _launch
 
-    _launch()
+    await _launch()
 
 
 __version__ = "1.0.0"
